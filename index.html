@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>AR Business Card</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Kivicube AR */
+    #kivicubeScene {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 1;
+    }
+
+    /* Voice button */
+    #voiceButton {
+      position: fixed;
+      right: 20px;
+      bottom: 25px;
+
+      width: 64px;
+      height: 64px;
+
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+
+      font-size: 28px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      z-index: 9999;
+
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+
+      box-shadow:
+        0 0 15px rgba(0, 200, 255, 0.5),
+        0 0 30px rgba(0, 200, 255, 0.2);
+    }
+
+    #voiceButton.listening {
+      background: rgba(0, 180, 255, 0.85);
+      box-shadow:
+        0 0 20px rgba(0, 200, 255, 0.9),
+        0 0 45px rgba(0, 200, 255, 0.6);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.08);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Small voice status */
+    #voiceStatus {
+      position: fixed;
+      right: 20px;
+      bottom: 98px;
+
+      max-width: 250px;
+
+      padding: 8px 13px;
+
+      border-radius: 15px;
+
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+
+      font-size: 13px;
+      text-align: center;
+
+      z-index: 9999;
+
+      opacity: 0;
+      pointer-events: none;
+
+      transition: opacity 0.2s ease;
+    }
+
+    #voiceStatus.show {
+      opacity: 1;
+    }
+
+    /* Error / unsupported message */
+    #message {
+      position: fixed;
+      left: 50%;
+      bottom: 25px;
+
+      transform: translateX(-50%);
+
+      padding: 10px 16px;
+
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+
+      border-radius: 10px;
+
+      font-size: 13px;
+
+      z-index: 9999;
+
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =====================================================
+       KIVICUBE AR SCENE
+       ===================================================== -->
+
+  <iframe
+    id="kivicubeScene"
+    scene-id="y6UN67nHQHKjaxEh3n9GbV4JnPd7T6Ln"
+    disable-open-url
+    allow="xr-spatial-tracking;camera;microphone;autoplay;fullscreen;gyroscope;accelerometer"
+  ></iframe>
+
+
+  <!-- =====================================================
+       VOICE BUTTON
+       ===================================================== -->
+
+  <button
+    id="voiceButton"
+    aria-label="Voice control"
+    title="Voice control"
+  >
+    🎤
+  </button>
+
+  <div id="voiceStatus"></div>
+
+  <div id="message"></div>
+
+
+  <!-- =====================================================
+       KIVICUBE WEB PLUGIN
+       ===================================================== -->
+
+  <script src="https://www.kivicube.com/lib/iframe-plugin.js"></script>
+
+
+  <script>
+
+    /* =====================================================
+       1. GET ELEMENTS
+       ===================================================== */
+
+    const kivicubeScene =
+      document.getElementById("kivicubeScene");
+
+    const voiceButton =
+      document.getElementById("voiceButton");
+
+    const voiceStatus =
+      document.getElementById("voiceStatus");
+
+    const message =
+      document.getElementById("message");
+
+
+    /* =====================================================
+       2. DESTINATIONS
+       ===================================================== */
+
+    const DESTINATIONS = {
+
+      email:
+        "https://mail.google.com/mail/?view=cm&fs=1&to=harishwaranr27@gmail.com",
+
+      linkedin:
+        "https://www.linkedin.com/in/harishwaran",
+
+      github:
+        "https://github.com/Harishwaranr",
+
+      call:
+        "tel:+916369734034",
+
+      resume:
+        "https://drive.google.com/file/d/1IJcpdeqITKljOka91CsQveNx1uptWEcg/view?usp=sharing"
+
+    };
+
+
+    /* =====================================================
+       3. NAVIGATION FUNCTION
+       ===================================================== */
+
+    function openDestination(url) {
+
+      if (!url) {
+
+        showMessage("Destination link is missing.");
+
+        return;
+      }
+
+      /*
+        Navigate in the actual browser instead of
+        trying to open the website inside Kivicube.
+      */
+
+      window.location.href = url;
+
+    }
+
+
+    /* =====================================================
+       4. KIVICUBE TOUCH ACTIONS
+       ===================================================== */
+
+    kivicubeScene.addEventListener(
+      "openUrl",
+      function(event) {
+
+        const url = event.detail;
+
+        console.log(
+          "Kivicube requested:",
+          url
+        );
+
+        if (url) {
+
+          openDestination(url);
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       5. KIVICUBE STATUS EVENTS
+       ===================================================== */
+
+    kivicubeScene.addEventListener(
+      "sceneStart",
+      function() {
+
+        console.log(
+          "Kivicube AR scene started"
+        );
+
+      }
+    );
+
+
+    kivicubeScene.addEventListener(
+      "tracked",
+      function() {
+
+        console.log(
+          "AR target detected"
+        );
+
+      }
+    );
+
+
+    kivicubeScene.addEventListener(
+      "lostTrack",
+      function() {
+
+        console.log(
+          "AR target lost"
+        );
+
+      }
+    );
+
+
+    kivicubeScene.addEventListener(
+      "error",
+      function(event) {
+
+        console.error(
+          "Kivicube error:",
+          event.detail
+        );
+
+        showMessage(
+          "Kivicube could not start."
+        );
+
+      }
+    );
+
+
+    /* =====================================================
+       6. VOICE RECOGNITION
+       ===================================================== */
+
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    let recognition = null;
+
+    let isListening = false;
+
+
+    if (SpeechRecognition) {
+
+      recognition =
+        new SpeechRecognition();
+
+      recognition.lang =
+        "en-IN";
+
+      recognition.continuous =
+        false;
+
+      recognition.interimResults =
+        false;
+
+      recognition.maxAlternatives =
+        3;
+
+
+      /* -----------------------------------------------
+         Voice started
+         ----------------------------------------------- */
+
+      recognition.onstart =
+        function() {
+
+          isListening = true;
+
+          voiceButton.classList.add(
+            "listening"
+          );
+
+          voiceStatus.textContent =
+            "Listening...";
+
+          voiceStatus.classList.add(
+            "show"
+          );
+
+        };
+
+
+      /* -----------------------------------------------
+         Voice result
+         ----------------------------------------------- */
+
+      recognition.onresult =
+        function(event) {
+
+          const transcript =
+            event.results[0][0]
+              .transcript
+              .toLowerCase()
+              .trim();
+
+          console.log(
+            "Voice command:",
+            transcript
+          );
+
+          voiceStatus.textContent =
+            "Heard: " + transcript;
+
+          handleVoiceCommand(
+            transcript
+          );
+
+        };
+
+
+      /* -----------------------------------------------
+         Voice stopped
+         ----------------------------------------------- */
+
+      recognition.onend =
+        function() {
+
+          isListening = false;
+
+          voiceButton.classList.remove(
+            "listening"
+          );
+
+          setTimeout(
+            function() {
+
+              voiceStatus.classList.remove(
+                "show"
+              );
+
+            },
+            1500
+          );
+
+        };
+
+
+      /* -----------------------------------------------
+         Voice error
+         ----------------------------------------------- */
+
+      recognition.onerror =
+        function(event) {
+
+          console.error(
+            "Speech recognition error:",
+            event.error
+          );
+
+          isListening = false;
+
+          voiceButton.classList.remove(
+            "listening"
+          );
+
+          voiceStatus.textContent =
+            "Didn't catch that. Try again.";
+
+          voiceStatus.classList.add(
+            "show"
+          );
+
+          setTimeout(
+            function() {
+
+              voiceStatus.classList.remove(
+                "show"
+              );
+
+            },
+            2000
+          );
+
+        };
+
+    }
+
+    else {
+
+      voiceButton.disabled =
+        true;
+
+      voiceButton.style.opacity =
+        "0.5";
+
+      showMessage(
+        "Voice recognition is not supported in this browser."
+      );
+
+    }
+
+
+    /* =====================================================
+       7. VOICE COMMAND PROCESSOR
+       ===================================================== */
+
+    function handleVoiceCommand(command) {
+
+
+      /* =================================================
+         EMAIL
+         ================================================= */
+
+      if (
+        command.includes("email") ||
+        command.includes("e mail") ||
+        command.includes("gmail") ||
+        command.includes("mail")
+      ) {
+
+        voiceStatus.textContent =
+          "Opening Email...";
+
+        openDestination(
+          DESTINATIONS.email
+        );
+
+        return;
+      }
+
+
+      /* =================================================
+         LINKEDIN
+         ================================================= */
+
+      if (
+        command.includes("linkedin") ||
+        command.includes("linked in")
+      ) {
+
+        voiceStatus.textContent =
+          "Opening LinkedIn...";
+
+        openDestination(
+          DESTINATIONS.linkedin
+        );
+
+        return;
+      }
+
+
+      /* =================================================
+         GITHUB
+         ================================================= */
+
+      if (
+        command.includes("github") ||
+        command.includes("git hub")
+      ) {
+
+        voiceStatus.textContent =
+          "Opening GitHub...";
+
+        openDestination(
+          DESTINATIONS.github
+        );
+
+        return;
+      }
+
+
+      /* =================================================
+         CALL
+         ================================================= */
+
+      if (
+        command.includes("call") ||
+        command.includes("phone") ||
+        command.includes("dial") ||
+        command.includes("contact")
+      ) {
+
+        voiceStatus.textContent =
+          "Calling...";
+
+        openDestination(
+          DESTINATIONS.call
+        );
+
+        return;
+      }
+
+
+      /* =================================================
+         RESUME
+         ================================================= */
+
+      if (
+        command.includes("resume") ||
+        command.includes("cv") ||
+        command.includes("curriculum vitae")
+      ) {
+
+        voiceStatus.textContent =
+          "Opening Resume...";
+
+        openDestination(
+          DESTINATIONS.resume
+        );
+
+        return;
+      }
+
+
+      /* =================================================
+         COMMAND NOT RECOGNIZED
+         ================================================= */
+
+      voiceStatus.textContent =
+        "Try: Email, LinkedIn, GitHub, Call or Resume.";
+
+    }
+
+
+    /* =====================================================
+       8. VOICE BUTTON CLICK
+       ===================================================== */
+
+    voiceButton.addEventListener(
+      "click",
+      function() {
+
+        if (!recognition) {
+
+          showMessage(
+            "Voice recognition is not supported."
+          );
+
+          return;
+        }
+
+
+        if (isListening) {
+
+          recognition.stop();
+
+          return;
+
+        }
+
+
+        try {
+
+          recognition.start();
+
+        }
+
+        catch (error) {
+
+          console.error(error);
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       9. MESSAGE HELPER
+       ===================================================== */
+
+    function showMessage(text) {
+
+      message.textContent =
+        text;
+
+      message.style.display =
+        "block";
+
+      setTimeout(
+        function() {
+
+          message.style.display =
+            "none";
+
+        },
+        3000
+      );
+
+    }
+
+  </script>
+
+</body>
+</html>
