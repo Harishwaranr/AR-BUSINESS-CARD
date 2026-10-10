@@ -3,7 +3,8 @@
 An interactive **Augmented Reality (AR) Business Card** that transforms a traditional professional business card into an immersive digital experience. Scan the QR code, open the AR experience, and interact with professional contact links through touch or voice commands.
 
 🌐 Live Demo
-  link:[Open AR Business Card](https://ar-business-card-4aex.onrender.com/)
+  link:
+  [Open AR Business Card](https://ar-business-card-4aex.onrender.com/)
 ## ✨ Features
 
 - **Augmented Reality Experience** — View an interactive digital business card through your device's camera.
