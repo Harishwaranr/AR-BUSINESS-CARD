@@ -2,7 +2,8 @@
 
 An interactive **Augmented Reality (AR) Business Card** that transforms a traditional professional business card into an immersive digital experience. Scan the QR code, open the AR experience, and interact with professional contact links through touch or voice commands.
 
-
+🌐 Live Demo
+  link:[Open AR Business Card](https://ar-business-card-4aex.onrender.com/)
 ## ✨ Features
 
 - **Augmented Reality Experience** — View an interactive digital business card through your device's camera.
@@ -61,8 +62,7 @@ AR-BUSINESS-CARD/
 This project is hosted on **Render** and connected to GitHub for source-code management.
 
 - **Repository:** [AR-BUSINESS-CARD](https://github.com/Harishwaranr/AR-BUSINESS-CARD)
-- **Live Website:** [Open AR Business Card](https://ar-business-card-4aex.onrender.com)
-
+- **Live Website:** [Open AR Business Card](https://ar-business-card-4aex.onrender.com/)
 ## 🎯 Project Goal
 
 The goal is to make professional networking more engaging by combining augmented reality, voice interaction, and digital contact information in a single experience.
