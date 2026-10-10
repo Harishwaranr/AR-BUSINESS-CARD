@@ -72,8 +72,7 @@ The goal is to make professional networking more engaging by combining augmented
 **Harishwaran**
 
 - [GitHub](https://github.com/Harishwaranr)
-- [LinkedIn](https://www.linkedin.com/in/harishwaran)
+  
 
----
 
 *Built to explore the possibilities of augmented reality and interactive digital networking.*
