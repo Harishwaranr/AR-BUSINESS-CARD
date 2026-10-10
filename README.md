@@ -46,7 +46,7 @@ Touch interaction is also supported through the corresponding icons.
 
 ## 🚀 How to Use
 
-1. Open the [Live Demo](https://ar-business-card-4aex.onrender.com) on a compatible device.
+1. Open the [Live Demo](https://ar-business-card-4aex.onrender.com/) on a compatible device.
 2. Allow camera access when prompted.
 3. View the AR business card.
 4. Tap any contact icon or use the microphone button.
